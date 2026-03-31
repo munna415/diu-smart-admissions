@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, GraduationCap, Bot, ChevronDown } from 'lucide-react';
+import { Menu, X, Bot, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ setIsChatOpen }) => {
@@ -38,14 +38,24 @@ const Navbar = ({ setIsChatOpen }) => {
       <div className="w-full px-4 lg:px-8 max-w-[100rem] mx-auto">
         <div className="flex justify-between items-center h-20">
           
+          {/* Logo and Title Section */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 cursor-pointer flex-shrink-0"
+            className="flex items-center gap-3 cursor-pointer flex-shrink-0"
           >
-            <GraduationCap size={36} className="text-secondary" />
+            {/* Daffodil Logo with white background for visibility */}
+            <div className="bg-white px-2 py-1 rounded-md shadow-sm flex items-center justify-center h-10 w-28 md:w-32">
+              <img 
+                src="https://daffodilvarsity.edu.bd/images/logo.svg" 
+                alt="DIU Logo" 
+                className="w-full h-full object-contain" 
+              />
+            </div>
+            
+            {/* Project Title */}
             <div>
-              <h1 className="text-lg lg:text-xl font-bold tracking-wide">DIU Smart Admissions</h1>
+              <h1 className="text-[17px] md:text-xl lg:text-[22px] font-bold tracking-wide">DIU Smart Admissions</h1>
             </div>
           </motion.div>
 
@@ -166,7 +176,7 @@ const Navbar = ({ setIsChatOpen }) => {
               <button 
                 onClick={() => {
                   setIsChatOpen(true);
-                  setIsOpen(false); // চ্যাট খুললে মোবাইল মেনুটা বন্ধ হয়ে যাবে
+                  setIsOpen(false);
                 }}
                 className="flex items-center justify-center gap-2 w-full bg-secondary text-white px-6 py-3 rounded-full font-semibold mt-6 shadow-md"
               >
