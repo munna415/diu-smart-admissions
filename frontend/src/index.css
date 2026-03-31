@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* আমরা পরবর্তীতে এখানে কিছু গ্লোবাল এনিমেশন যুক্ত করব */
