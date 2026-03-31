@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, User, Sparkles, Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm'; // নতুন প্লাগইন ইমপোর্ট করা হলো
+import remarkGfm from 'remark-gfm';
 
 const Chatbot = ({ isChatOpen, setIsChatOpen }) => {
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'হ্যালো! আমি DIU Smart Assistant 🤖। ড্যাফোডিল ইউনিভার্সিটির ভর্তি, ফি, বা অন্য যেকোনো বিষয়ে আমাকে প্রশ্ন করতে পারেন।' }
+    { sender: 'bot', text: 'হ্যালো! আমি DIU Smart Assistant 🤖। ড্যাফোডিল ইউনিভার্সিটির ভর্তি, ফি, বা অন্য যেকোনো বিষয়ে আমাকে প্রশ্ন করতে পারেন।' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,17 +31,20 @@ const Chatbot = ({ isChatOpen, setIsChatOpen }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://192.168.110.155:5000/api/chat', {
+      // লোকাল হোস্টের বদলে রেন্ডারের লাইভ লিংক ব্যবহার করা হয়েছে
+      const response = await fetch('https://diu-smart-admissions.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage }),
       });
 
+      if (!response.ok) throw new Error('Network response was not ok');
+
       const data = await response.json();
       setMessages(prev => [...prev, { sender: 'bot', text: data.reply }]);
     } catch (error) {
       console.error("Error:", error);
-      setMessages(prev => [...prev, { sender: 'bot', text: "দুঃখিত, কানেকশনে সমস্যা হচ্ছে। আপনার ব্যাকএন্ড সার্ভার কি চালু আছে?" }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: "দুঃখিত, কানেকশনে সমস্যা হচ্ছে। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।" }]);
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +105,7 @@ const Chatbot = ({ isChatOpen, setIsChatOpen }) => {
             {/* Messages Area */}
             <div className="flex-1 p-4 md:p-5 overflow-y-auto bg-gray-50 flex flex-col gap-5">
               {messages.map((msg, index) => (
-                <div key={index} className={`flex items-start gap-2.5 max-w-[85%] ${msg.sender === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}>
+                <div key={index} className={`flex items-start gap-2.5 max-w-[90%] ${msg.sender === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}>
                   <div className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 text-primary' : 'bg-green-100 text-secondary'}`}>
                     {msg.sender === 'user' ? <User size={18} /> : <Bot size={18} />}
                   </div>
@@ -111,29 +114,26 @@ const Chatbot = ({ isChatOpen, setIsChatOpen }) => {
                     {msg.sender === 'user' ? (
                       msg.text
                     ) : (
-                      <div className="text-gray-800 break-words prose max-w-none">
+                      <div className="text-gray-800 break-words prose max-w-none prose-sm sm:prose-base">
                         <ReactMarkdown
-                          remarkPlugins={[remarkGfm]} // এখানে রিমার্ক জিএফএম যুক্ত করা হয়েছে
+                          remarkPlugins={[remarkGfm]}
                           components={{
                             p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
                             ul: ({node, ...props}) => <ul className="list-disc ml-5 mb-2" {...props} />,
                             ol: ({node, ...props}) => <ol className="list-decimal ml-5 mb-2" {...props} />,
                             h1: ({node, ...props}) => <h1 className="text-xl font-bold mb-2 text-primary" {...props} />,
                             h2: ({node, ...props}) => <h2 className="text-lg font-bold mb-2 text-primary" {...props} />,
-                            h3: ({node, ...props}) => <h3 className="text-md font-bold mb-1" {...props} />,
                             blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-secondary pl-3 italic my-2 bg-green-50 p-2 text-gray-700 rounded-r-md" {...props} />,
-                            table: ({node, ...props}) => <div className="overflow-x-auto my-2 rounded-lg border border-gray-300"><table className="min-w-full divide-y divide-gray-200" {...props} /></div>,
-                            th: ({node, ...props}) => <th className="px-3 py-2 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider border" {...props} />,
+                            table: ({node, ...props}) => <div className="overflow-x-auto my-4 rounded-lg border border-gray-300 shadow-sm"><table className="min-w-full divide-y divide-gray-200 border-collapse" {...props} /></div>,
+                            thead: ({node, ...props}) => <thead className="bg-gray-100" {...props} />,
+                            th: ({node, ...props}) => <th className="px-3 py-2 text-left text-xs font-bold text-gray-700 uppercase border" {...props} />,
                             td: ({node, ...props}) => <td className="px-3 py-2 text-sm border bg-white" {...props} />,
-                            a: ({node, ...props}) => <a className="text-blue-600 hover:underline font-medium" target="_blank" rel="noopener noreferrer" {...props} />,
-                            hr: ({node, ...props}) => <hr className="my-3 border-gray-300" {...props} />,
                           }}
                         >
                           {msg.text}
                         </ReactMarkdown>
                       </div>
                     )}
-
                   </div>
                 </div>
               ))}
